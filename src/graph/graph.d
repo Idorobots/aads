@@ -64,12 +64,17 @@ struct ListGraph {
             edges = edges[].filter!(fun).array();
 
             // NOTE Remove vertex iff no more edges point to it when it doesn't have any outgoing edges.
-            if(verts[e.v1()].length == 0 && edges.map!(edge => edge.v2() == e.v1()).any()) {
+            if(verts[e.v1()].empty && edges.map!(edge => edge.v2() == e.v1()).any()) {
                 this.remove(e.v1());
             }
             return true;
         }
         return false;
+    }
+
+    alias Edges = Edge[];
+    Edges edgesOf(Vertex v) {
+        return (v in verts) ? verts[v] : [];
     }
 
     struct VRange(R) {
@@ -83,11 +88,6 @@ struct ListGraph {
         Vertex front() {
             return r.front().v2();
         }
-    }
-
-    alias Edges = Edge[];
-    Edges edgesOf(Vertex v) {
-        return (v in verts) ? verts[v] : [];
     }
 
     alias Verteces = VRange!(Edges);

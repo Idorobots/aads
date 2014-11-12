@@ -45,6 +45,8 @@ bool warshalFloyd(Graph)(Graph g, Weight[] d, Vertex[] p) if(isGraph!(Graph)) {
 }
 
 void main() {
+    // TODO Add CTFE only version for the added wow-factor.
+
     StopWatch sw;
 
     sw.start();
