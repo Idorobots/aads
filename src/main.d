@@ -124,4 +124,29 @@ void main() {
         current = p[current * size + source];
     }
     writeln(current);
+
+    write("O(1) version:");
+
+    enum graph = import("./g2");
+    enum lines = graph.split("\n");
+    enum g = ListGraph();
+
+    foreach(line; lines) {
+        enum a = line.split("; ").map!(to!Vertex);
+        g.add(a[0]);
+        g.add(a[1]);
+        g.add(Edge(a[0], a[1], a[2]));
+    }
+
+    enum n = g.numVerteces();
+
+    enum Weight[n*n] ws;
+    enum Vertex[n*n] ps;
+
+    sw.reset();
+    sw.start();
+    enum r = floydWarshal(g, ws, ps);
+    sw.stop();
+
+    writeln(sw.peek().msecs);
 }

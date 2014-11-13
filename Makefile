@@ -1,7 +1,7 @@
 RM = rm -f
 DC = gdc
 LDLIBS =
-DFLAGS = -Isrc -Isrc/graph
+DFLAGS = -Isrc -Isrc/graph -J.
 #GDB = -fdebug -funittest -ggdb3
 GDB = -O3 -frelease -ffast-math -fno-bounds-check
 
