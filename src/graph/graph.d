@@ -57,14 +57,14 @@ struct ListGraph {
     }
 
     bool remove(Edge e) {
-        if(e.v1() in verts) {
+        if(edges.map!(edge => edge == e).any()) {
             auto fun = (Edge edge) => edge != e;
 
-            verts[e.v1()] = verts[e.v1()][].filter!(fun).array();
-            edges = edges[].filter!(fun).array();
+            verts[e.v1()] = verts[e.v1()].filter!(fun).array();
+            edges = edges.filter!(fun).array();
 
             // NOTE Remove vertex iff no more edges point to it when it doesn't have any outgoing edges.
-            if(verts[e.v1()].empty && edges.map!(edge => edge.v2() == e.v1()).any()) {
+            if(this.edgesOf(e.v1()).empty && edges.map!(edge => edge.v2() == e.v1()).any()) {
                 this.remove(e.v1());
             }
             return true;
@@ -112,52 +112,151 @@ struct ListGraph {
     }
 }
 
-alias MatrixGraph = ListGraph;
+struct MatrixGraph {
+    size_t size;
+    size_t numVerts;
+    Weight[] verts;
+    Edge[] edges;
 
-// FIXME Actually implement this...
-// struct MatrixGraph {
-//     Vertex[] verts;
-//     Edge[] edges;
+    private void resize(size_t n) {
+        if(n > size) {
+            Weight[] newVerts;
+            newVerts.length = n*n;
 
-//     bool addVertex(Vertex v) {
+            for(size_t x = 0; x < size; ++x) {
+                for(long y = 0; y < size; ++y) {
+                    newVerts[y * n + x] = verts[y * size + x];
+                }
+            }
+            verts = newVerts;
+            size = n;
+        }
+    }
 
-//     }
+    private bool contained(Vertex v) {
+        return v < size && verts[v * size + v] == Weight.max;
+    }
 
-//     bool removeVertex(Vertex v) {
+    bool add(Vertex v) {
+        if(!contained(v)) {
+            resize(v+1);
 
-//     }
+            for(size_t i = 0; i < size; ++i) {
+                verts[i * size + v] = Weight.max;
+                verts[v * size + i] = Weight.max;
+            }
 
-//     bool addEdge(Edge e) {
+            verts[v * size + v] = Weight.max; // NOTE Indicates that a vertex is in the graph.
+            numVerts++;
 
-//     }
+            return true;
+        }
+        return false;
+    }
 
-//     bool removeEdge(Edge e) {
+    bool remove(Vertex v) {
+        if(contained(v)) {
+            for(size_t i = 0; i < size; ++i) {
+                verts[i * size + v] = Weight.max;
+                verts[v * size + i] = Weight.max;
+            }
+            verts[v * size + v] = 0; // NOTE Indicates that a vertex is removed from the graph.
 
-//     }
+            edges = edges.filter!(edge => edge.v1() == v || edge.v2() == v).array();
+            numVerts--;
+            return true;
+        }
+        return false;
+    }
 
+    bool add(Edge e) {
+        if(contained(e.v1()) && contained(e.v2())) {
+            verts[e.v2 * size + e.v1()] = e.w();
+            edges ~= e;
 
-//     Verteces neighbours(Vertex v) {
+            return true;
+        }
+        return false;
+    }
 
-//     }
+    bool remove(Edge e) {
+        if(edges.map!(edge => edge == e).any()) {
+            verts[e.v2() * size + e.v1()] = Weight.max;
+            edges = edges.filter!(edge => edge != e).array();
 
-//     Edges edges(Vertex v) {
+            // NOTE Remove vertex iff no more edges point to it when it doesn't have any outgoing edges.
+            if(this.edgesOf(e.v1()).empty && edges.map!(edge => edge.v2() == e.v1()).any()) {
+                this.remove(e.v1());
+            }
 
-//     }
+        }
+        return false;
+    }
 
-//     size_t numVertexes() {
+    struct ERange {
+        MatrixGraph* that;
+        Vertex source;
+        Vertex current;
 
-//     }
+        this(Vertex source, MatrixGraph* that) {
+            this.that = that;
+            this.source = source;
+            this.current = 0;
+        }
 
-//     size_t numEdges() {
+        bool empty() {
+            return current == that.size;
+        }
 
-//     }
+        void popFront() {
+            if(!this.empty()) {
+                current++;
+                if(that.verts[current * that.size + source] == Weight.max) popFront();
+            }
+        }
 
-//     bool areNeighbours(Vertex v1, Vertex v2) {
+        Edge front() {
+            assert(!this.empty());
+            return Edge(source, current, that.verts[current * that.size + source]);
+        }
+    }
 
-//     }
+    alias Edges = ERange;
+    Edges edgesOf(Vertex v) {
+        return Edges(v, &this);
+    }
 
-//     @property Vertex[] verteces() {
+    struct VRange(R) {
+        R r;
+        alias r this;
 
-//     }
-// }
+        this(R r) {
+            this.r = r;
+        }
+
+        Vertex front() {
+            return r.front().v2();
+        }
+    }
+
+    alias Verteces = VRange!(Edges);
+    Verteces neighboursOf(Vertex v) {
+        return Verteces(this.edgesOf(v));
+    }
+
+    size_t numVerteces() {
+        return numVerts;
+    }
+
+    size_t numEdges() {
+        return edges.length;
+    }
+
+    bool neighbours(Vertex v1, Vertex v2) {
+        if(v1 < size && v2 < size) {
+            return verts[v2 * size + v1] != Weight.max;
+        }
+        return false;
+    }
+}
 

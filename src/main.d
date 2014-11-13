@@ -45,8 +45,6 @@ bool warshalFloyd(Graph)(Graph g, Weight[] d, Vertex[] p) if(isGraph!(Graph)) {
 }
 
 void main() {
-    // TODO Add CTFE only version for the added wow-factor.
-
     StopWatch sw;
 
     sw.start();
@@ -84,9 +82,9 @@ void main() {
 
     GC.enable();
 
-    auto t1 =  sw.peek();
+    auto t1 = sw.peek();
 
-    writeln("ListGraph time: ", t1.msecs);
+    writeln(typeof(g1).stringof, " time: ", t1.msecs);
 
     GC.disable();
 
@@ -98,12 +96,12 @@ void main() {
     GC.enable();
 
     auto t2 = sw.peek();
-    writeln("MatrixGraph time: ", t2.msecs);
+    writeln(typeof(g2).stringof, " time: ", t2.msecs);
     writeln("Ratio: ", (1.0 * t1.msecs)/t2.msecs);
 
     void writeMatrix(M)(M m, size_t size) {
-        for(uint i = 0; i < size; ++i) {
-            for(uint j = 0; j < size; ++j) {
+        for(size_t i = 0; i < size; ++i) {
+            for(size_t j = 0; j < size; ++j) {
                 writef("%4  d ", m[j * size + i]);
             }
             writeln();
