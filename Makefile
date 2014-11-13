@@ -1,12 +1,12 @@
 RM = rm -f
 DC = gdc
 LDLIBS =
-DFLAGS = -Isrc -Isrc/graph -J.
+DFLAGS = -Isrc -Isrc/graph -Isrc/algorithms -J.
 #GDB = -fdebug -funittest -ggdb3
 GDB = -O3 -frelease -ffast-math -fno-bounds-check
 
-VPATH = src src/graph
-OBJS = main.o graph.o
+VPATH = src:src/graph:src/algorithms
+OBJS = main.o graph.o algorithms.o
 
 TARGET = graph
 
