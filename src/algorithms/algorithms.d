@@ -2,7 +2,7 @@ module algorithms;
 
 import graph;
 
-bool warshalFloyd(Graph)(Graph g, Weight[] d, Vertex[] p) if(isGraph!(Graph)) {
+bool floydWarshall(Graph)(Graph g, Weight[] d, Vertex[] p) if(isGraph!Graph) {
     auto size = g.numVerteces();
 
     for(Vertex x = 0; x < size; ++x) {
@@ -32,6 +32,11 @@ bool warshalFloyd(Graph)(Graph g, Weight[] d, Vertex[] p) if(isGraph!(Graph)) {
             }
         }
     }
+
+    return true;
+}
+
+bool bellmanFord(Graph)(Graph g, Weight[] d, Vertex[]p, Vertex source) if(isGraph!Graph) {
 
     return true;
 }
