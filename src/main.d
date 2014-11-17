@@ -153,8 +153,8 @@ void testBF() {
     Vertex[] p;
     Vertex source = 109;
 
-    d.length = size * size;
-    p.length = size * size;
+    d.length = size;
+    p.length = size;
 
 
     GC.disable();
@@ -187,7 +187,7 @@ void testBF() {
 
     writeln("Distance:");
     //writeMatrix(d, size);
-    writeln(d[goal * size + source]);
+    writeln(d[goal]);
 
     writeln("Predecessors:");
     //writeMatrix(p, size);
@@ -195,7 +195,7 @@ void testBF() {
     auto current = goal;
     while(current != source) {
         write(current, " -> ");
-        current = p[current * size + source];
+        current = p[current];
     }
     writeln(current);
 }
