@@ -24,7 +24,7 @@ void writeMatrix(M)(M m, size_t size) {
     }
 }
 
-void testFW() {
+void testFW(Vertex source, Vertex goal) {
     writeln("Floyd-Warshall:");
 
     StopWatch sw;
@@ -81,9 +81,6 @@ void testFW() {
     writeln(typeof(g2).stringof, " time: ", t2.msecs);
     writeln("Ratio: ", (1.0 * t1.msecs)/t2.msecs);
 
-    Vertex source = 109;
-    Vertex goal = 609;
-
     writeln("Distance:");
     //writeMatrix(d, size);
     writeln(d[goal * size + source]);
@@ -124,7 +121,7 @@ void testFW() {
     // writeln(sw.peek().msecs);
 }
 
-void testBF() {
+void testBF(Vertex source, Vertex goal) {
     writeln("Bellman-Ford:");
 
     StopWatch sw;
@@ -151,11 +148,9 @@ void testBF() {
 
     Weight[] d;
     Vertex[] p;
-    Vertex source = 109;
 
     d.length = size;
     p.length = size;
-
 
     GC.disable();
 
@@ -183,8 +178,6 @@ void testBF() {
     writeln(typeof(g2).stringof, " time: ", t2.msecs);
     writeln("Ratio: ", (1.0 * t1.msecs)/t2.msecs);
 
-    Vertex goal = 609;
-
     writeln("Distance:");
     //writeMatrix(d, size);
     writeln(d[goal]);
@@ -200,7 +193,7 @@ void testBF() {
     writeln(current);
 }
 
-void testFF() {
+void testFF(Vertex source, Vertex goal) {
     writeln("Ford-Fulkerson:");
 
     StopWatch sw;
@@ -257,27 +250,33 @@ void testFF() {
     writeln(typeof(g2).stringof, " time: ", t2.msecs);
     writeln("Ratio: ", (1.0 * t1.msecs)/t2.msecs);
 
-    writeln("Capacity:");
-    //writeMatrix(c, size);
-    writeln(c[goal * size + source]);
-
     writeln("Flow:");
     //writeMatrix(f, size);
-    writeln(f[goal * size + source]);
+
+    Flow fl = 0;
+    foreach(Edge e; g1.edgesOf(source)) {
+        fl += f[e.v2() * size + e.v1()];
+    }
+    writeln(fl);
 }
 
 void main(string[] args) {
     enum Algorithm {FloydWarshall, BellmanFord, FordFulkerson, None};
+
     Algorithm algorithm = Algorithm.None;
+    Vertex source;
+    Vertex goal;
 
     void help() {
         writeln("Usage: ", args[0], " [OPTIONS]");
         writeln();
         writeln("OPTIONS:");
-        writefln("%-20s%s", "-h --help", "Display this message.");
-        writef("%-20s%s", "-a --algorithm", "One of the following algorithms: ");
+        writefln("  %-20s%s", "-h --help", "Display this message.");
+        writefln("  %-20s%s", "-s --source", "Source vertex.");
+        writefln("  %-20s%s", "-g --goal", "Goal vertex.");
+        writef("  %-20s%s", "-a --algorithm", "One of the following algorithms: ");
 
-        foreach(e; EnumMembers!Algorithm) {
+        foreach(e; EnumMembers!(Algorithm)[0 .. $-1]) {
             writef("%s, ", e);
         }
 
@@ -285,14 +284,20 @@ void main(string[] args) {
         exit(0);
     }
 
-    getopt(args,
-           "algorithm|a", &algorithm,
-           "help|h", &help);
+    try {
+        getopt(args,
+               "algorithm|a", &algorithm,
+               "source|s", &source,
+               "goal|g", &goal,
+               "help|h", &help);
 
-    switch(algorithm) {
-        case Algorithm.FloydWarshall: return testFW();
-        case Algorithm.BellmanFord:   return testBF();
-        case Algorithm.FordFulkerson: return testFF();
-        default:                      return help();
+        switch(algorithm) {
+            case Algorithm.FloydWarshall: return testFW(source, goal);
+            case Algorithm.BellmanFord:   return testBF(source, goal);
+            case Algorithm.FordFulkerson: return testFF(source, goal);
+            default:                      return help();
+        }
+    } catch (Exception e) {
+        return help();
     }
 }
