@@ -46,12 +46,17 @@ bool bellmanFord(Graph)(Graph g, Weight[] d, Vertex[]p, Vertex source) if(isGrap
 
     d[source] = 0;
 
-    for(size_t i = 0; i < size; ++i) {
+    bool changed = true;
+
+    for(size_t i = 0; i < size && changed; ++i) {
+        changed = false;
+
         foreach(Edge e; g.edges) {
             if(d[e.v1()] != Weight.max) {
                 if(d[e.v1()] + e.w() < d[e.v2()]) {
                     d[e.v2()] = d[e.v1()] + e.w();
                     p[e.v2()] = e.v1();
+                    changed = true;
                 }
             }
         }
