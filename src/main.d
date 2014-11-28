@@ -192,16 +192,84 @@ void testBF() {
     writeln("Predecessors:");
     //writeMatrix(p, size);
 
-    auto current = goal;
-    while(current != source) {
-        write(current, " -> ");
-        current = p[current];
+    Edge last;
+    foreach(Edge e; path(d, p, source, goal)) {
+        last = e;
+        write(e.v1(), " -> ");
     }
-    writeln(current);
+    writeln(last.v2());
+}
+
+void testFF() {
+    writeln("Ford-Fulkerson:");
+
+    StopWatch sw;
+
+    sw.start();
+    auto g1 = ListGraph();
+    auto g2 = MatrixGraph();
+
+    foreach(line; stdin.byLine()) {
+        auto a = line.split("; ").map!(to!Vertex);
+        g1.add(a[0]);
+        g1.add(a[1]);
+        g1.add(Edge(a[0], a[1], a[2]));
+        g2.add(a[0]);
+        g2.add(a[1]);
+        g2.add(Edge(a[0], a[1], a[2]));
+    }
+    sw.stop();
+
+    writeln("Build time: ", sw.peek().msecs);
+
+    auto size = g1.numVerteces();
+    writeln("Size: ", size);
+
+    Weight[] c;
+    Flow[] f;
+    Vertex source = 109;
+    Vertex goal = 609;
+
+    c.length = size * size;
+    f.length = size * size;
+
+    GC.disable();
+
+    sw.reset();
+    sw.start();
+    fordFulkerson(g1, c, f, source, goal);
+    sw.stop();
+
+    GC.enable();
+
+    auto t1 = sw.peek();
+
+    writeln(typeof(g1).stringof, " time: ", t1.msecs);
+
+    GC.disable();
+
+    sw.reset();
+    sw.start();
+    fordFulkerson(g2, c, f, source, goal);
+    sw.stop();
+
+    GC.enable();
+
+    auto t2 = sw.peek();
+    writeln(typeof(g2).stringof, " time: ", t2.msecs);
+    writeln("Ratio: ", (1.0 * t1.msecs)/t2.msecs);
+
+    writeln("Capacity:");
+    //writeMatrix(c, size);
+    writeln(c[goal * size + source]);
+
+    writeln("Flow:");
+    //writeMatrix(f, size);
+    writeln(f[goal * size + source]);
 }
 
 void main(string[] args) {
-    enum Algorithm {FloydWarshall, BellmanFord};
+    enum Algorithm {FloydWarshall, BellmanFord, FordFulkerson};
     Algorithm algorithm;
 
     void help() {
@@ -226,6 +294,7 @@ void main(string[] args) {
     switch(algorithm) {
         case Algorithm.FloydWarshall: return testFW();
         case Algorithm.BellmanFord:   return testBF();
+        case Algorithm.FordFulkerson: return testFF();
         default:                      return help();
     }
 }
