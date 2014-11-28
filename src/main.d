@@ -269,8 +269,8 @@ void testFF() {
 }
 
 void main(string[] args) {
-    enum Algorithm {FloydWarshall, BellmanFord, FordFulkerson};
-    Algorithm algorithm;
+    enum Algorithm {FloydWarshall, BellmanFord, FordFulkerson, None};
+    Algorithm algorithm = Algorithm.None;
 
     void help() {
         writeln("Usage: ", args[0], " [OPTIONS]");
