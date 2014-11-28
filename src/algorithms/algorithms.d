@@ -38,42 +38,6 @@ bool floydWarshall(Graph)(Graph g, Weight[] d, Vertex[] p) if(isGraph!Graph) {
     return true;
 }
 
-auto path(Weight[] d, Vertex[] p, Vertex source, Vertex goal) {
-    struct Path {
-        private Weight[] d;
-        private Vertex[] p;
-        private Vertex current;
-        private Vertex goal;
-
-        this(Weight[] d, Vertex[] p, Vertex source, Vertex goal) {
-            this.d = d;
-            this.p = p;
-            this.current = goal;
-            this.goal = source;
-        }
-
-        bool empty() {
-            auto next = p[current];
-            return current == goal || next == Vertex.max;
-        }
-
-        Edge front() {
-            auto next = p[current];
-            assert(next != Vertex.max, "Bad path!");
-
-            auto size = p.length;
-            return Edge(current, next, d[next]);
-        }
-
-        void popFront() {
-            assert(!this.empty(), "End of path!");
-            current = p[current];
-        }
-    }
-
-    return Path(d, p, source, goal);
-}
-
 bool bellmanFord(Graph)(Graph g, Weight[] d, Vertex[]p, Vertex source) if(isGraph!Graph) {
     auto size =  g.numVerteces();
 
@@ -110,48 +74,36 @@ bool bellmanFord(Graph)(Graph g, Weight[] d, Vertex[]p, Vertex source) if(isGrap
 }
 
 alias Flow = long;
-bool fordFulkerson(Graph)(Graph g, Weight[] c, Flow[] f, Vertex source, Vertex goal) if (isGraph!Graph) {
-    auto size =  g.numVerteces();
+bool fordFulkerson(Graph)(Graph g, Flow[] f, Vertex source, Vertex goal) if (isGraph!Graph) {
+    auto size = g.numVerteces();
 
     foreach(Edge e; g.edges) {
-        c[e.v2() * size + e.v1()] = e.w();
         f[e.v2() * size + e.v1()] = 0;
     }
 
-    Weight[] d;
-    Vertex[] p;
+    alias Path = Edge[];
 
-    d.length = size;
-    p.length = size;
+    Path findPath(Vertex source, Vertex goal, Path acc = []) {
+        if(source == goal) return acc;
 
-    bool findPath(Graph g, Vertex source, Vertex goal) {
-        bellmanFord(g, d, p, source);
-
-        auto pt = path(d, p, source, goal);
-
-        for(;;) {
-            if(pt.empty) return false;
-
-            auto e = pt.front;
-
-            if(c[e.v2() * size + e.v1()] == 0) return false;
-            if(e.v2() == source) return true;
-
-            pt.popFront();
+        foreach(Edge e; sort!((e1, e2) => e1.v2() < e2.v2())(g.edgesOf(source))) {
+            if((cast(Flow) e.w()) > f[e.v2() * size + e.v1()]) {
+                if(!acc.canFind(e)) {
+                    auto result = findPath(e.v2(), goal, acc ~ e);
+                    if(result != null) return result;
+                }
+            }
         }
 
-        assert(0, "Bad path");
+        return null;
     }
 
-    bool compare(Edge e1, Edge e2) {
-        return c[e1.v2() * size + e1.v1()] < c[e2.v2() * size + e2.v1()];
-    }
+    Path path;
 
-    while(findPath(g, source, goal)) {
-        auto minE = minCount!(compare)(path(d, p, source, goal));
-        auto minC = minE[0].w();
+    while((path = findPath(source, goal)) != null) {
+        auto minC = reduce!min(map!(e => e.w() - f[e.v2() * size + e.v1()])(path));
 
-        foreach(Edge e; path(d, p, source, goal)) {
+        foreach(Edge e; path) {
             f[e.v2() * size + e.v1()] += minC;
             f[e.v1() * size + e.v2()] -= minC;
         }

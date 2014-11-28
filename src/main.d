@@ -192,12 +192,12 @@ void testBF() {
     writeln("Predecessors:");
     //writeMatrix(p, size);
 
-    Edge last;
-    foreach(Edge e; path(d, p, source, goal)) {
-        last = e;
-        write(e.v1(), " -> ");
+    auto current = goal;
+    while(current != source) {
+        write(current, " -> ");
+        current = p[current];
     }
-    writeln(last.v2());
+    writeln(current);
 }
 
 void testFF() {
@@ -214,9 +214,11 @@ void testFF() {
         g1.add(a[0]);
         g1.add(a[1]);
         g1.add(Edge(a[0], a[1], a[2]));
+        g1.add(Edge(a[1], a[0], 0));
         g2.add(a[0]);
         g2.add(a[1]);
         g2.add(Edge(a[0], a[1], a[2]));
+        g2.add(Edge(a[1], a[0], 0));
     }
     sw.stop();
 
@@ -225,19 +227,15 @@ void testFF() {
     auto size = g1.numVerteces();
     writeln("Size: ", size);
 
-    Weight[] c;
     Flow[] f;
-    Vertex source = 109;
-    Vertex goal = 609;
 
-    c.length = size * size;
     f.length = size * size;
 
-    GC.disable();
+    //GC.disable();
 
     sw.reset();
     sw.start();
-    fordFulkerson(g1, c, f, source, goal);
+    fordFulkerson(g1, f, source, goal);
     sw.stop();
 
     GC.enable();
@@ -246,11 +244,11 @@ void testFF() {
 
     writeln(typeof(g1).stringof, " time: ", t1.msecs);
 
-    GC.disable();
+    //GC.disable();
 
     sw.reset();
     sw.start();
-    fordFulkerson(g2, c, f, source, goal);
+    //fordFulkerson(g2, f, source, goal);
     sw.stop();
 
     GC.enable();
