@@ -91,7 +91,7 @@ bool fordFulkerson(Graph)(Graph g, Flow[] f, Vertex source, Vertex goal) if (isG
         foreach(Edge e; g.edgesOf(source)) {
             auto residual = (cast(Flow) e.w()) - f[e.v2() * size + e.v1()];
 
-            if(residual > 0 && !Path.Range(acc).contains(e)) {
+            if(residual > 0 && !Path.Range(acc).map!(ed => ed.v1() == source).any()) {
                 auto result = findPath(e.v2(), goal, Path.add(e, acc));
                 if(result !is null) return result;
             }
