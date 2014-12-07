@@ -3,6 +3,7 @@ module algorithms;
 import std.algorithm;
 
 import graph;
+import utils;
 
 bool floydWarshall(Graph)(Graph g, Weight[] d, Vertex[] p) if(isGraph!Graph) {
     auto size = g.numVerteces();
@@ -81,17 +82,18 @@ bool fordFulkerson(Graph)(Graph g, Flow[] f, Vertex source, Vertex goal) if (isG
         f[e.v2() * size + e.v1()] = 0;
     }
 
-    alias Path = Edge[];
+    alias Path = ListNode!(Edge)*;
 
-    Path findPath(Vertex source, Vertex goal, Path acc = []) {
+    Path findPath(Vertex source, Vertex goal, Path acc = null) {
         if(source == goal) return acc;
 
-        foreach(Edge e; sort!((e1, e2) => e1.v2() < e2.v2())(g.edgesOf(source))) {
-            if((cast(Flow) e.w()) > f[e.v2() * size + e.v1()]) {
-                if(!acc.canFind(e)) {
-                    auto result = findPath(e.v2(), goal, acc ~ e);
-                    if(result != null) return result;
-                }
+        // FIXME Try adjusting the ordering of edges...
+        foreach(Edge e; g.edgesOf(source)) {
+            auto residual = (cast(Flow) e.w()) - f[e.v2() * size + e.v1()];
+
+            if(residual > 0 && !Path.Range(acc).contains(e)) {
+                auto result = findPath(e.v2(), goal, Path.add(e, acc));
+                if(result !is null) return result;
             }
         }
 
@@ -100,12 +102,14 @@ bool fordFulkerson(Graph)(Graph g, Flow[] f, Vertex source, Vertex goal) if (isG
 
     Path path;
 
-    while((path = findPath(source, goal)) != null) {
-        auto minC = reduce!min(map!(e => e.w() - f[e.v2() * size + e.v1()])(path));
+    while((path = findPath(source, goal)) !is null) {
+        auto flow = Path.Range(path)
+                .map!(e => (cast(Flow) e.w()) - f[e.v2() * size + e.v1()])()
+                .reduce!min();
 
-        foreach(Edge e; path) {
-            f[e.v2() * size + e.v1()] += minC;
-            f[e.v1() * size + e.v2()] -= minC;
+        foreach(Edge e; Path.Range(path)) {
+            f[e.v2() * size + e.v1()] += flow;
+            f[e.v1() * size + e.v2()] -= flow;
         }
     }
 

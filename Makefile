@@ -6,7 +6,7 @@ DFLAGS = -Wall -Wextra -Isrc -Isrc/graph -Isrc/algorithms -J.
 GDB = -O3 -frelease -ffast-math -fno-bounds-check
 
 VPATH = src:src/graph:src/algorithms
-OBJS = main.o graph.o algorithms.o
+OBJS = main.o graph.o algorithms.o utils.o
 
 TARGET = graph
 
