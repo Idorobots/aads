@@ -261,7 +261,7 @@ void testFF(Vertex source, Vertex goal) {
 }
 
 void main(string[] args) {
-    enum Algorithm {FloydWarshall, BellmanFord, FordFulkerson, None};
+    enum Algorithm {FloydWarshall, BellmanFord, FordFulkerson, None}
 
     Algorithm algorithm = Algorithm.None;
     Vertex source;
