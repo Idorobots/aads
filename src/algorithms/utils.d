@@ -1,6 +1,7 @@
 module utils;
 
 import std.stdio;
+import std.container;
 
 string slurp(File f) {
     string output;
@@ -16,6 +17,24 @@ void writeMatrix(M)(M m, size_t size) {
             writef("%4  d ", m[j * size + i]);
         }
         writeln();
+    }
+}
+
+struct Queue(Element) {
+    private DList!Element lst;
+
+    bool empty() {
+        return lst.empty();
+    }
+
+    bool enqueue(Element e) {
+        return lst.insertBack(e) == 1;
+    }
+
+    Element dequeue() {
+        auto e = lst.front();
+        lst.removeFront();
+        return e;
     }
 }
 

@@ -87,21 +87,18 @@ Flow fordFulkerson(Graph)(Graph g, Vertex source, Vertex goal) if (isGraph!Graph
     edgeTo.length = size;
     marked.length = size;
 
-    alias Queue = Vertex[];
-
     bool findPath() {
         for(size_t i = 0; i < marked.length; ++i) {
             marked[i] = false;
         }
 
-        Queue queue;
-        queue ~= source;
+        Queue!Vertex queue;
 
+        queue.enqueue(source);
         marked[source] = true;
 
-        while(queue.length != 0) {
-            auto v1 = queue[0];
-            queue = queue[1 .. $];
+        while(!queue.empty()) {
+            auto v1 = queue.dequeue();
 
             foreach(Edge e; g.edgesOf(v1)) {
                 auto v2 = e.v2();
@@ -111,7 +108,7 @@ Flow fordFulkerson(Graph)(Graph g, Vertex source, Vertex goal) if (isGraph!Graph
                     if(!marked[v2]) {
                         edgeTo[v2] = e;
                         marked[v2] = true;
-                        queue ~= v2;
+                        queue.enqueue(v2);
                     }
                 }
             }
