@@ -13,16 +13,7 @@ import std.datetime;
 
 import graph;
 import algorithms;
-
-
-void writeMatrix(M)(M m, size_t size) {
-    for(size_t i = 0; i < size; ++i) {
-        for(size_t j = 0; j < size; ++j) {
-            writef("%4  d ", m[j * size + i]);
-        }
-        writeln();
-    }
-}
+import utils;
 
 void testFW(Vertex source, Vertex goal) {
     writeln("Floyd-Warshall:");

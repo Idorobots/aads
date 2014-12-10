@@ -1,5 +1,16 @@
 module utils;
 
+import std.stdio;
+
+void writeMatrix(M)(M m, size_t size) {
+    for(size_t i = 0; i < size; ++i) {
+        for(size_t j = 0; j < size; ++j) {
+            writef("%4  d ", m[j * size + i]);
+        }
+        writeln();
+    }
+}
+
 struct ListNode(Element) {
     private ListNode!(Element)* next;
     public Element e;
