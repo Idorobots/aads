@@ -187,7 +187,13 @@ void testFF(string graph, Vertex source, Vertex goal) {
     writeln(typeof(g2).stringof, " time: ", t2.msecs);
     writeln("Ratio: ", (1.0 * t1.msecs)/t2.msecs);
 
-    writeln("Flow: ", flow);
+    Flow sourceMax, goalMax;
+    foreach(Edge e; g1.edges) {
+        if(e.v1() == source) sourceMax += e.w();
+        if(e.v2() == goal) goalMax += e.w();
+    }
+
+    writeln("Flow: ", sourceMax, " >= ", flow, " <= ", goalMax);
 }
 
 void main(string[] args) {
