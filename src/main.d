@@ -157,11 +157,9 @@ void testFF(string graph, Vertex source, Vertex goal) {
         g1.add(a[0]);
         g1.add(a[1]);
         g1.add(Edge(a[0], a[1], a[2]));
-        g1.add(Edge(a[1], a[0], 0));
         g2.add(a[0]);
         g2.add(a[1]);
         g2.add(Edge(a[0], a[1], a[2]));
-        g2.add(Edge(a[1], a[0], 0));
     }
     sw.stop();
 
