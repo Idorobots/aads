@@ -177,7 +177,7 @@ struct MatrixGraph {
     bool add(Edge e) {
         if(!contained(e.v1()) || !contained(e.v2())) return false;
 
-        verts[e.v2() * size + e.v1()] = e.w();
+        verts[e.v1() * size + e.v2()] = e.w();
         edges ~= e;
 
         return true;
@@ -185,7 +185,7 @@ struct MatrixGraph {
 
     bool remove(Edge e) {
         if(edges.map!(edge => edge == e).any()) {
-            verts[e.v2() * size + e.v1()] = Weight.max;
+            verts[e.v1() * size + e.v2()] = Weight.max;
             edges = edges.filter!(edge => edge != e).array();
 
             // NOTE Remove vertex iff no more edges point to it when it doesn't have any outgoing edges.
@@ -202,7 +202,7 @@ struct MatrixGraph {
         Edges es;
 
         for(Vertex u = 0; u < size; ++u) {
-            auto w = verts[u * size + v];
+            auto w = verts[v * size + u];
 
             if(u != v && contained(u) && w < Weight.max) {
                 es ~= Edge(v, u, w);
