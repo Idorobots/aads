@@ -30,6 +30,19 @@ template isGraph(Graph) {
         }));
 }
 
+struct VRange(ERange) {
+    ERange r;
+    alias r this;
+
+    this(ERange r) {
+        this.r = r;
+    }
+
+    Vertex front() {
+        return r.front().v2();
+    }
+}
+
 struct ListGraph {
     Edge[][Vertex] verts;
     Edge[] edges; // FIXME This probably should be gone.
@@ -77,19 +90,6 @@ struct ListGraph {
         return (v in verts) ? verts[v] : [];
     }
 
-    struct VRange(R) {
-        R r;
-        alias r this;
-
-        this(R r) {
-            this.r = r;
-        }
-
-        Vertex front() {
-            return r.front().v2();
-        }
-    }
-
     alias Verteces = VRange!(Edges);
     Verteces neighboursOf(Vertex v) {
         return Verteces(this.edgesOf(v));
@@ -123,60 +123,64 @@ struct MatrixGraph {
             Weight[] newVerts;
             newVerts.length = n*n;
 
-            for(size_t x = 0; x < size; ++x) {
-                for(long y = 0; y < size; ++y) {
-                    newVerts[y * n + x] = verts[y * size + x];
+            for(Vertex x = 0; x < n; ++x) {
+                for(Vertex y = 0; y < n; ++y) {
+                    if(x < size && y < size) {
+                         newVerts[y * n + x] = verts[y * size + x];
+                    } else {
+                        newVerts[y * n + x] = Weight.max;
+                    }
                 }
             }
+
             verts = newVerts;
             size = n;
         }
     }
 
     private bool contained(Vertex v) {
-        return v < size && verts[v * size + v] == Weight.max;
+        return v < size && verts[v * size + v] == 0;
     }
 
     bool add(Vertex v) {
-        if(!contained(v)) {
-            resize(v+1);
+        if(contained(v)) return false;
 
-            for(size_t i = 0; i < size; ++i) {
-                verts[i * size + v] = Weight.max;
-                verts[v * size + i] = Weight.max;
-            }
+        resize(v+1);
 
-            verts[v * size + v] = Weight.max; // NOTE Indicates that a vertex is in the graph.
-            numVerts++;
-
-            return true;
+        for(Vertex i = 0; i < size; ++i) {
+            verts[i * size + v] = Weight.max;
+            verts[v * size + i] = Weight.max;
         }
-        return false;
+
+        verts[v * size + v] = 0; // NOTE Indicates that a vertex is in the graph.
+        numVerts++;
+
+        return true;
+
     }
 
     bool remove(Vertex v) {
-        if(contained(v)) {
-            for(size_t i = 0; i < size; ++i) {
-                verts[i * size + v] = Weight.max;
-                verts[v * size + i] = Weight.max;
-            }
-            verts[v * size + v] = 0; // NOTE Indicates that a vertex is removed from the graph.
+        if(!contained(v)) return false;
 
-            edges = edges.filter!(edge => edge.v1() == v || edge.v2() == v).array();
-            numVerts--;
-            return true;
+        for(Vertex i = 0; i < size; ++i) {
+            verts[i * size + v] = Weight.max;
+            verts[v * size + i] = Weight.max;
         }
-        return false;
+        verts[v * size + v] = Weight.max; // NOTE Indicates that a vertex is removed from the graph.
+
+        edges = edges.filter!(edge => edge.v1() == v || edge.v2() == v).array();
+        numVerts--;
+
+        return true;
     }
 
     bool add(Edge e) {
-        if(contained(e.v1()) && contained(e.v2())) {
-            verts[e.v2 * size + e.v1()] = e.w();
-            edges ~= e;
+        if(!contained(e.v1()) || !contained(e.v2())) return false;
 
-            return true;
-        }
-        return false;
+        verts[e.v2() * size + e.v1()] = e.w();
+        edges ~= e;
+
+        return true;
     }
 
     bool remove(Edge e) {
@@ -193,50 +197,19 @@ struct MatrixGraph {
         return false;
     }
 
-    struct ERange {
-        MatrixGraph* that;
-        Vertex source;
-        Vertex current;
+    alias Edges = Edge[];
+    Edges edgesOf(Vertex v) {
+        Edges es;
 
-        this(Vertex source, MatrixGraph* that) {
-            this.that = that;
-            this.source = source;
-            this.current = 0;
-        }
+        for(Vertex u = 0; u < size; ++u) {
+            auto w = verts[u * size + v];
 
-        bool empty() {
-            return current == that.size;
-        }
-
-        void popFront() {
-            if(!this.empty()) {
-                current++;
-                if(that.verts[current * that.size + source] == Weight.max) popFront();
+            if(u != v && contained(u) && w < Weight.max) {
+                es ~= Edge(v, u, w);
             }
         }
 
-        Edge front() {
-            assert(!this.empty());
-            return Edge(source, current, that.verts[current * that.size + source]);
-        }
-    }
-
-    alias Edges = ERange;
-    Edges edgesOf(Vertex v) {
-        return Edges(v, &this);
-    }
-
-    struct VRange(R) {
-        R r;
-        alias r this;
-
-        this(R r) {
-            this.r = r;
-        }
-
-        Vertex front() {
-            return r.front().v2();
-        }
+        return es;
     }
 
     alias Verteces = VRange!(Edges);

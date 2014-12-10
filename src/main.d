@@ -181,9 +181,9 @@ void testFF(string graph, Vertex source, Vertex goal) {
 
     sw.reset();
     sw.start();
-    // auto f = fordFulkerson(g2, source, goal);
+    auto f = fordFulkerson(g2, source, goal);
     sw.stop();
-    // assert(f == flow);
+    assert(f == flow);
 
     auto t2 = sw.peek();
     writeln(typeof(g2).stringof, " time: ", t2.msecs);
