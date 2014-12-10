@@ -2,6 +2,14 @@ module utils;
 
 import std.stdio;
 
+string slurp(File f) {
+    string output;
+    foreach(char[] line; f.byLine()) {
+        output ~= line ~ "\n";
+    }
+    return output[0 .. $-1]; // NOTE Leave out the last newline.
+}
+
 void writeMatrix(M)(M m, size_t size) {
     for(size_t i = 0; i < size; ++i) {
         for(size_t j = 0; j < size; ++j) {

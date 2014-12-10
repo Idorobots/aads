@@ -5,7 +5,7 @@ import std.algorithm;
 import graph;
 import utils;
 
-bool floydWarshall(Graph)(Graph g, Weight[] d, Vertex[] p) if(isGraph!Graph) {
+void floydWarshall(Graph)(Graph g, Weight[] d, Vertex[] p) if(isGraph!Graph) {
     auto size = g.numVerteces();
 
     for(Vertex x = 0; x < size; ++x) {
@@ -35,11 +35,9 @@ bool floydWarshall(Graph)(Graph g, Weight[] d, Vertex[] p) if(isGraph!Graph) {
             }
         }
     }
-
-    return true;
 }
 
-bool bellmanFord(Graph)(Graph g, Weight[] d, Vertex[]p, Vertex source) if(isGraph!Graph) {
+void bellmanFord(Graph)(Graph g, Weight[] d, Vertex[] p, Vertex source) if(isGraph!Graph) {
     auto size =  g.numVerteces();
 
     for(Vertex v = 0; v < size; ++v) {
@@ -70,8 +68,6 @@ bool bellmanFord(Graph)(Graph g, Weight[] d, Vertex[]p, Vertex source) if(isGrap
             assert(0, "Graph contains negative-weight cycle!");
         }
     }
-
-    return true;
 }
 
 alias Flow = long;
