@@ -82,32 +82,56 @@ bool fordFulkerson(Graph)(Graph g, Flow[] f, Vertex source, Vertex goal) if (isG
         f[e.v2() * size + e.v1()] = 0;
     }
 
-    alias Path = ListNode!(Edge)*;
+    bool[] marked;
+    Edge[] edgeTo;
 
-    Path findPath(Vertex source, Vertex goal, Path acc = null) {
-        if(source == goal) return acc;
+    edgeTo.length = size;
+    marked.length = size;
 
-        // FIXME Try adjusting the ordering of edges...
-        foreach(Edge e; g.edgesOf(source)) {
-            auto residual = (cast(Flow) e.w()) - f[e.v2() * size + e.v1()];
+    alias Queue = Vertex[];
 
-            if(residual > 0 && !Path.Range(acc).map!(ed => ed.v1() == source).any()) {
-                auto result = findPath(e.v2(), goal, Path.add(e, acc));
-                if(result !is null) return result;
+    bool findPath() {
+        for(size_t i = 0; i < marked.length; ++i) {
+            marked[i] = false;
+        }
+
+        Queue queue;
+        queue ~= source;
+
+        marked[source] = true;
+
+        while(queue.length != 0) {
+            auto v1 = queue[0];
+            queue = queue[1 .. $];
+
+            foreach(Edge e; g.edgesOf(v1)) {
+                auto v2 = e.v2();
+                auto residual = (cast(Flow) e.w()) - f[v2 * size + v1];
+
+                if(residual > 0) {
+                    if(!marked[v2]) {
+                        edgeTo[v2] = e;
+                        marked[v2] = true;
+                        queue ~= v2;
+                    }
+                }
             }
         }
 
-        return null;
+        return marked[goal];
     }
 
-    Path path;
+    while(findPath()) {
+        Flow flow = Flow.max;
 
-    while((path = findPath(source, goal)) !is null) {
-        auto flow = Path.Range(path)
-                .map!(e => (cast(Flow) e.w()) - f[e.v2() * size + e.v1()])()
-                .reduce!min();
+        for(Vertex v = goal; v != source; v = edgeTo[v].v1()) {
+            auto e = edgeTo[v];
+            auto residual = (cast(Flow) e.w()) - f[e.v2() * size + e.v1()];
+            flow = min(flow, residual);
+        }
 
-        foreach(Edge e; Path.Range(path)) {
+        for(Vertex v = goal; v != source; v = edgeTo[v].v1()) {
+            auto e = edgeTo[v];
             f[e.v2() * size + e.v1()] += flow;
             f[e.v1() * size + e.v2()] -= flow;
         }
