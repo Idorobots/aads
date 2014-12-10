@@ -199,7 +199,8 @@ struct MatrixGraph {
 
     alias Edges = Edge[];
     Edges edgesOf(Vertex v) {
-        Edges es;
+        auto es = appender!Edges();
+        es.reserve(edges.length / numVerteces); // NOTE Reserve branchingFactor elements.
 
         for(Vertex u = 0; u < size; ++u) {
             auto w = verts[v * size + u];
@@ -209,7 +210,7 @@ struct MatrixGraph {
             }
         }
 
-        return es;
+        return es.data;
     }
 
     alias Verteces = VRange!(Edges);
