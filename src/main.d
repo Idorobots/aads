@@ -211,15 +211,11 @@ void testFF(Vertex source, Vertex goal) {
     auto size = g1.numVerteces();
     writeln("Size: ", size);
 
-    Flow[] f;
-
-    f.length = size * size;
-
     //GC.disable();
 
     sw.reset();
     sw.start();
-    fordFulkerson(g1, f, source, goal);
+    auto flow = fordFulkerson(g1, source, goal);
     sw.stop();
 
     GC.enable();
@@ -232,7 +228,8 @@ void testFF(Vertex source, Vertex goal) {
 
     sw.reset();
     sw.start();
-    //fordFulkerson(g2, f, source, goal);
+    // auto f = fordFulkerson(g2, source, goal);
+    // assert(f == flow);
     sw.stop();
 
     GC.enable();
@@ -242,13 +239,7 @@ void testFF(Vertex source, Vertex goal) {
     writeln("Ratio: ", (1.0 * t1.msecs)/t2.msecs);
 
     writeln("Flow:");
-    //writeMatrix(f, size);
-
-    Flow fl = 0;
-    foreach(Edge e; g1.edgesOf(source)) {
-        fl += f[e.v2() * size + e.v1()];
-    }
-    writeln(fl);
+    writeln(flow);
 }
 
 void main(string[] args) {

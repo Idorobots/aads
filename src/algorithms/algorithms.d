@@ -75,8 +75,11 @@ bool bellmanFord(Graph)(Graph g, Weight[] d, Vertex[]p, Vertex source) if(isGrap
 }
 
 alias Flow = long;
-bool fordFulkerson(Graph)(Graph g, Flow[] f, Vertex source, Vertex goal) if (isGraph!Graph) {
+Flow fordFulkerson(Graph)(Graph g, Vertex source, Vertex goal) if (isGraph!Graph) {
     auto size = g.numVerteces();
+
+    Flow[] f;
+    f.length = size * size;
 
     foreach(Edge e; g.edges) {
         f[e.v2() * size + e.v1()] = 0;
@@ -121,6 +124,8 @@ bool fordFulkerson(Graph)(Graph g, Flow[] f, Vertex source, Vertex goal) if (isG
         return marked[goal];
     }
 
+    Flow maxFlow;
+
     while(findPath()) {
         Flow flow = Flow.max;
 
@@ -135,7 +140,9 @@ bool fordFulkerson(Graph)(Graph g, Flow[] f, Vertex source, Vertex goal) if (isG
             f[e.v2() * size + e.v1()] += flow;
             f[e.v1() * size + e.v2()] -= flow;
         }
+
+        maxFlow += flow;
     }
 
-    return true;
+    return maxFlow;
 }
