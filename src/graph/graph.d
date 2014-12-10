@@ -205,7 +205,7 @@ struct MatrixGraph {
         for(Vertex u = 0; u < size; ++u) {
             auto w = verts[v * size + u];
 
-            if(u != v && contained(u) && w < Weight.max) {
+            if(u != v && w < Weight.max) {
                 es ~= Edge(v, u, w);
             }
         }
