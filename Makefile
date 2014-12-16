@@ -1,12 +1,13 @@
 RM = rm -f
 DC = gdc
 LDLIBS =
-DFLAGS = -Wall -Wextra -Isrc -Isrc/huffman
+DFLAGS = -Wall -Wextra -Isrc
 GDB = -fdebug -funittest -ggdb3
 #GDB = -O3 -frelease -ffast-math -fno-bounds-check
 
-VPATH = src:src/huffman
-OBJS = main.o huffman.o
+VPATH = src
+
+OBJS = main.o huffman.o utils.o
 
 TARGET = huffman
 
