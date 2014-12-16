@@ -1,2 +1,4 @@
 huffman
+test/
+*.huf*
 *.o
