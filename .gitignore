@@ -1,2 +1,5 @@
-graph
+graph/graph
+huffman/huffman
+huffman/test/
+huffman/*.huf*
 *.o
