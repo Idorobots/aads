@@ -14,7 +14,7 @@ void compress(ubyte chunksize, File input, File output) {
     auto i = input.toChunks(chunksize);
     auto f = computeFrequencies(i);
 
-    output.rawWrite((&chunksize)[0..1]);
+    output.writeInt(chunksize);
     output.writeFrequencies(f);
     output.rawWrite(encode(buildTree(f), i));
 }
@@ -26,10 +26,9 @@ void decompress(File input, File output) {
 
     enforce(h == HEADER, "Cannot decompress non-" ~ HEADER ~ " files.");
 
-    ubyte chunksize;
-    input.rawRead((&chunksize)[0..1]);
-
+    auto chunksize = input.readInt!ubyte();
     auto f = readFrequencies(input);
+
     output.rawWrite(decode(buildTree(f), input.toChunks(chunksize)));
 }
 

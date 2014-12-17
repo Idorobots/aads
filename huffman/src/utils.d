@@ -3,6 +3,18 @@ module utils;
 import std.stdio;
 import std.array;
 
+T readInt(T)(File f) {
+    ubyte[T.sizeof] buffer;
+    f.rawRead(buffer);
+    return *cast(T*) buffer.ptr;
+}
+
+void writeInt(T)(File f, T v) {
+    ubyte[T.sizeof] buffer;
+    buffer = (cast(ubyte*) &v)[0..T.sizeof];
+    f.rawWrite(buffer);
+}
+
 alias Chunk = ubyte[];
 Chunk[] toChunks(File f, size_t chunksize) {
     auto arr = appender!(Chunk[])();
