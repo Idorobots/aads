@@ -27,7 +27,7 @@ void decompress(File input, File output) {
     enforce(h == HEADER, "Cannot decompress non-" ~ HEADER ~ " files.");
 
     auto chunksize = input.readInt!ubyte();
-    auto f = readFrequencies(input);
+    auto f = readFrequencies(input, chunksize);
 
     output.rawWrite(decode(buildTree(f), input.toChunks(chunksize)));
 }
@@ -53,15 +53,39 @@ HuffmanTree buildTree(FrequencyTable f) {
 }
 
 FrequencyTable computeFrequencies(Chunk[] data) {
-    // TODO
-    return null;
+    FrequencyTable f;
+
+    foreach(Chunk c; data) {
+        f[c.idup]++;
+    }
+
+    return f;
 }
 
 void writeFrequencies(File output, FrequencyTable f) {
-    // TODO
+    output.writeInt(f.length);
+
+    foreach(k, v; f) {
+        output.rawWrite(k);
+        output.writeInt(v);
+    }
 }
 
-FrequencyTable readFrequencies(File input) {
-    // TODO
-    return null;
+FrequencyTable readFrequencies(File input, ubyte chunksize) {
+    FrequencyTable f;
+
+    auto length = input.readInt!size_t();
+
+    ubyte[] buffer;
+    buffer.length = chunksize;
+
+    for(size_t i = 0; i < length; ++i) {
+        input.rawRead(buffer);
+
+        auto freq = input.readInt!Frequency();
+
+        f[buffer.idup] = freq;
+    }
+
+    return f;
 }
