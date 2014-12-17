@@ -11,7 +11,7 @@ enum HEADER = "ZAiSD";
 void compress(ubyte chunksize, File input, File output) {
     output.write(HEADER);
 
-    auto i = input.readChunks(chunksize);
+    auto i = input.toChunks(chunksize);
     auto f = computeFrequencies(i);
 
     output.rawWrite((&chunksize)[0..1]);
@@ -30,10 +30,9 @@ void decompress(File input, File output) {
     input.rawRead((&chunksize)[0..1]);
 
     auto f = readFrequencies(input);
-    output.rawWrite(decode(buildTree(f), input.readChunks(chunksize)));
+    output.rawWrite(decode(buildTree(f), input.toChunks(chunksize)));
 }
 
-alias Chunk = ubyte[];
 alias HuffmanTree = BitArray[Chunk];
 
 ubyte[] encode(HuffmanTree tree, Chunk[] data) {

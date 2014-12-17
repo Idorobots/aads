@@ -3,8 +3,9 @@ module utils;
 import std.stdio;
 import std.array;
 
-ubyte[][] readChunks(File f, size_t chunksize) {
-    auto arr = appender!(ubyte[][])();
+alias Chunk = ubyte[];
+Chunk[] toChunks(File f, size_t chunksize) {
+    auto arr = appender!(Chunk[])();
 
     foreach(ubyte[] chunk; f.byChunk(chunksize)) {
         arr ~= chunk.dup;
