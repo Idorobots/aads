@@ -16,10 +16,14 @@ void writeInt(T)(File f, T v) {
 }
 
 alias Chunk = ubyte[];
-Chunk[] toChunks(File f, size_t chunksize) {
-    auto arr = appender!(Chunk[])();
+alias toChunks = toX!Chunk;
+alias toBytes = toX!ubyte;
+alias toWords = toX!size_t;
 
-    foreach(ubyte[] chunk; f.byChunk(chunksize)) {
+X[] toX(X)(File f, size_t chunksize = X.sizeof) {
+    auto arr = appender!(X[])();
+
+    foreach(chunk; f.byChunk(chunksize)) {
         arr ~= chunk.dup;
     }
 

@@ -32,16 +32,57 @@ void decompress(File input, File output) {
     output.rawWrite(decode(buildTree(f), input.toChunks(chunksize)));
 }
 
-alias HuffmanTree = BitArray[Chunk];
-
-ubyte[] encode(HuffmanTree tree, Chunk[] data) {
-    // TODO
-    return [];
+    output.rawWrite(decode(buildTree(f), input.toWords()));
 }
 
-ubyte[] decode(HuffmanTree tree, Chunk[] data) {
+struct HuffmanTree {
     // TODO
-    return [];
+
+    BitArray opIndex(Chunk c) {
+        return BitArray();
+    }
+
+    Chunk opIndex(BitArray b) {
+        return null;
+    }
+
+    bool contains(BitArray b) {
+        return false;
+    }
+
+    bool contains(Chunk c) {
+        return false;
+    }
+}
+
+size_t[] encode(HuffmanTree tree, Chunk[] data) {
+    BitArray ba;
+
+    foreach(chunk; data) {
+        enforce(tree.contains(chunk), "Malformed Huffman encoding table has been produced.");
+        ba ~= tree[chunk];
+    }
+
+    return cast(size_t[]) ba;
+}
+
+ubyte[] decode(HuffmanTree tree, size_t[] data) {
+    ubyte[] result;
+
+    BitArray ba;
+    ba.init(data, data.length * size_t.sizeof * 8);
+
+    BitArray prefix;
+    foreach(bit; ba) {
+        prefix ~= bit;
+
+        if(tree.contains(prefix)) {
+            result ~= tree[prefix];
+            prefix = BitArray();
+        }
+    }
+
+    return result;
 }
 
 alias Frequency = size_t;
@@ -49,7 +90,7 @@ alias FrequencyTable = Frequency[Chunk];
 
 HuffmanTree buildTree(FrequencyTable f) {
     // TODO
-    return null;
+    return HuffmanTree();
 }
 
 FrequencyTable computeFrequencies(Chunk[] data) {
