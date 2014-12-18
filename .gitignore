@@ -1,5 +1,4 @@
 graph/graph
 huffman/huffman
-huffman/test/
-huffman/*.huf*
+huffman/test/*.huf*
 *.o
