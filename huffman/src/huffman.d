@@ -11,11 +11,15 @@ enum HEADER = "ZAiSD";
 void compress(ubyte chunksize, File input, File output) {
     output.write(HEADER);
 
-    auto i = input.toChunks(chunksize);
+    auto b = input.toBytes();
+    auto i = b.toChunks(chunksize);
     auto f = computeFrequencies(i);
 
     output.writeInt(chunksize);
+    output.writeInt(b.length);
+
     output.writeFrequencies(f);
+
     output.rawWrite(encode(buildTree(f), i));
 }
 
@@ -27,9 +31,11 @@ void decompress(File input, File output) {
     enforce(h == HEADER, "Cannot decompress non-" ~ HEADER ~ " files.");
 
     auto chunksize = input.readInt!ubyte();
+    auto length = input.readInt!size_t();
+
     auto f = readFrequencies(input, chunksize);
 
-    output.rawWrite(decode(buildTree(f), input.toChunks(chunksize)));
+    output.rawWrite(decode(buildTree(f), input.toWords())[0..length]);
 }
 
     output.rawWrite(decode(buildTree(f), input.toWords()));

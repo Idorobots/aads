@@ -30,6 +30,18 @@ X[] toX(X)(File f, size_t chunksize = X.sizeof) {
     return arr.data;
 }
 
+Chunk[] toChunks(ubyte[] bytes, size_t chunksize) {
+    auto chunks = appender!(Chunk[])();
+
+    while(bytes.length > chunksize) {
+        chunks ~= bytes[0..chunksize].dup;
+        bytes = bytes[chunksize..$];
+    }
+    chunks ~= bytes[0..chunksize].dup;
+
+    return chunks.data;
+}
+
 size_t currPos(File f, size_t pos = 0) {
     if(pos != 0) f.seek(pos);
 
