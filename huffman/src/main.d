@@ -7,7 +7,7 @@ import std.typecons;
 import huffman;
 
 void main(string[] args) {
-    ubyte chunksize = 1;
+    ubyte chunksize = 2;
     bool comp, decomp;
     string outfile = "", infile = "";
 
