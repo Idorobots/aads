@@ -53,26 +53,46 @@ struct HuffmanTree {
 }
 
 struct HuffmanEncoding {
-    // TODO
+    struct BitArrayWrapper {
+        BitArray ba;
+
+        const int opCmp(ref const BitArrayWrapper baw) {
+            return ba.opCmp(baw.ba.dup);
+        }
+    }
+
+    Chunk[BitArrayWrapper] chunks;
+    BitArray[Chunk] prefixes;
 
     this(HuffmanTree* t) {
-        // TODO
+        void treeWalk(HuffmanTree* node, BitArray ba) {
+            if(node.c !is null) {
+                auto baw = BitArrayWrapper(ba);
+                chunks[BitArrayWrapper(ba)] = node.c.dup;
+                prefixes[node.c] = ba;
+            } else {
+                treeWalk(node.left, ba.dup ~ false);
+                treeWalk(node.right, ba.dup ~ true);
+            }
+        }
+
+        treeWalk(t, BitArray());
     }
 
     BitArray opIndex(Chunk c) {
-        return BitArray();
+        return prefixes[c];
     }
 
     Chunk opIndex(BitArray b) {
-        return null;
+        return chunks[BitArrayWrapper(b)];
     }
 
     bool contains(BitArray b) {
-        return false;
+        return (BitArrayWrapper(b) in chunks) !is null;
     }
 
     bool contains(Chunk c) {
-        return false;
+        return (c in prefixes) !is null;
     }
 }
 
