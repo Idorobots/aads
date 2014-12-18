@@ -3,6 +3,7 @@ module huffman;
 import std.stdio;
 import std.bitmanip;
 import std.exception;
+import std.algorithm;
 
 import utils;
 
@@ -38,11 +39,25 @@ void decompress(File input, File output) {
     output.rawWrite(decode(buildTree(f), input.toWords())[0..length]);
 }
 
-    output.rawWrite(decode(buildTree(f), input.toWords()));
+struct HuffmanTree {
+    Frequency f;
+    const Chunk c;
+    HuffmanTree* left, right;
+
+    this(Frequency f, const Chunk c = null, HuffmanTree* left = null, HuffmanTree* right = null) {
+        this.f = f;
+        this.left = left;
+        this.right = right;
+        this.c = c;
+    }
 }
 
 struct HuffmanEncoding {
     // TODO
+
+    this(HuffmanTree* t) {
+        // TODO
+    }
 
     BitArray opIndex(Chunk c) {
         return BitArray();
@@ -95,8 +110,19 @@ alias Frequency = size_t;
 alias FrequencyTable = Frequency[Chunk];
 
 HuffmanEncoding buildTree(FrequencyTable f) {
-    // TODO
-    return HuffmanEncoding();
+    HuffmanTree*[] nodes;
+
+    foreach(k, v; f) {
+        nodes ~= new HuffmanTree(v, k);
+    }
+
+    while(nodes.length > 1) {
+        nodes.sort!((e1, e2) => e1.f < e2.f)();
+        auto node = new HuffmanTree(nodes[0].f + nodes[1].f, null, nodes[0], nodes[1]);
+        nodes = nodes[2..$] ~ node;
+    }
+
+    return HuffmanEncoding(nodes[0]);
 }
 
 FrequencyTable computeFrequencies(Chunk[] data) {
