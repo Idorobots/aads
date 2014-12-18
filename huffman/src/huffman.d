@@ -10,6 +10,8 @@ import utils;
 
 enum HEADER = "ZAiSD";
 
+alias len_t = uint;
+
 void compress(ubyte chunksize, File input, File output) {
     output.write(HEADER);
 
@@ -18,7 +20,7 @@ void compress(ubyte chunksize, File input, File output) {
     auto f = computeFrequencies(i);
 
     output.writeInt(chunksize);
-    output.writeInt(b.length);
+    output.writeInt!len_t(cast(len_t) b.length);
 
     output.writeFrequencies(f);
 
@@ -33,7 +35,7 @@ void decompress(File input, File output) {
     enforce(h == HEADER, "Cannot decompress non-" ~ HEADER ~ " files.");
 
     auto chunksize = input.readInt!ubyte();
-    auto length = input.readInt!size_t();
+    auto length = input.readInt!len_t();
 
     auto f = readFrequencies(input, chunksize);
 
@@ -135,7 +137,7 @@ ubyte[] decode(HuffmanEncoding tree, ubyte[] data) {
     return result.data;
 }
 
-alias Frequency = size_t;
+alias Frequency = uint;
 alias FrequencyTable = Frequency[Chunk];
 
 HuffmanEncoding buildTree(FrequencyTable f) {
@@ -167,7 +169,7 @@ FrequencyTable computeFrequencies(Chunk[] data) {
 }
 
 void writeFrequencies(File output, FrequencyTable f) {
-    output.writeInt(f.length);
+    output.writeInt!len_t(cast(len_t) f.length);
 
     foreach(k, v; f) {
         output.rawWrite(k);
@@ -178,7 +180,7 @@ void writeFrequencies(File output, FrequencyTable f) {
 FrequencyTable readFrequencies(File input, ubyte chunksize) {
     FrequencyTable f;
 
-    auto length = input.readInt!size_t();
+    auto length = input.readInt!len_t();
 
     ubyte[] buffer;
     buffer.length = chunksize;
