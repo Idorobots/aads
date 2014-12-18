@@ -35,7 +35,7 @@ void decompress(File input, File output) {
     output.rawWrite(decode(buildTree(f), input.toWords()));
 }
 
-struct HuffmanTree {
+struct HuffmanEncoding {
     // TODO
 
     BitArray opIndex(Chunk c) {
@@ -55,7 +55,7 @@ struct HuffmanTree {
     }
 }
 
-size_t[] encode(HuffmanTree tree, Chunk[] data) {
+size_t[] encode(HuffmanEncoding tree, Chunk[] data) {
     BitArray ba;
 
     foreach(chunk; data) {
@@ -66,7 +66,7 @@ size_t[] encode(HuffmanTree tree, Chunk[] data) {
     return cast(size_t[]) ba;
 }
 
-ubyte[] decode(HuffmanTree tree, size_t[] data) {
+ubyte[] decode(HuffmanEncoding tree, size_t[] data) {
     ubyte[] result;
 
     BitArray ba;
@@ -88,9 +88,9 @@ ubyte[] decode(HuffmanTree tree, size_t[] data) {
 alias Frequency = size_t;
 alias FrequencyTable = Frequency[Chunk];
 
-HuffmanTree buildTree(FrequencyTable f) {
+HuffmanEncoding buildTree(FrequencyTable f) {
     // TODO
-    return HuffmanTree();
+    return HuffmanEncoding();
 }
 
 FrequencyTable computeFrequencies(Chunk[] data) {
