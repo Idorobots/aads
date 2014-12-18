@@ -37,7 +37,9 @@ Chunk[] toChunks(ubyte[] bytes, size_t chunksize) {
         chunks ~= bytes[0..chunksize].dup;
         bytes = bytes[chunksize..$];
     }
-    chunks ~= bytes[0..chunksize].dup;
+
+    bytes.length = chunksize;
+    chunks ~= bytes.dup;
 
     return chunks.data;
 }

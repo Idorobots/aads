@@ -1,5 +1,6 @@
 module huffman;
 
+import std.array;
 import std.stdio;
 import std.bitmanip;
 import std.exception;
@@ -36,7 +37,7 @@ void decompress(File input, File output) {
 
     auto f = readFrequencies(input, chunksize);
 
-    output.rawWrite(decode(buildTree(f), input.toWords())[0..length]);
+    output.rawWrite(decode(buildTree(f), input.toBytes())[0..length]);
 }
 
 struct HuffmanTree {
@@ -58,6 +59,14 @@ struct HuffmanEncoding {
 
         const int opCmp(ref const BitArrayWrapper baw) {
             return ba.opCmp(baw.ba.dup);
+        }
+
+        const bool opEquals(ref const BitArrayWrapper baw) {
+            return ba.opEquals(baw.ba);
+        }
+
+        const size_t toHash() {
+            return ba.toHash();
         }
     }
 
@@ -107,11 +116,11 @@ size_t[] encode(HuffmanEncoding tree, Chunk[] data) {
     return cast(size_t[]) ba;
 }
 
-ubyte[] decode(HuffmanEncoding tree, size_t[] data) {
-    ubyte[] result;
+ubyte[] decode(HuffmanEncoding tree, ubyte[] data) {
+    auto result = appender!(ubyte[])();
 
     BitArray ba;
-    ba.init(data, data.length * size_t.sizeof * 8);
+    ba.init(data, data.length * size_t.sizeof);
 
     BitArray prefix;
     foreach(bit; ba) {
@@ -123,7 +132,7 @@ ubyte[] decode(HuffmanEncoding tree, size_t[] data) {
         }
     }
 
-    return result;
+    return result.data;
 }
 
 alias Frequency = size_t;
@@ -135,6 +144,8 @@ HuffmanEncoding buildTree(FrequencyTable f) {
     foreach(k, v; f) {
         nodes ~= new HuffmanTree(v, k);
     }
+
+    nodes.sort!((e1, e2) => e1.c < e2.c)();
 
     while(nodes.length > 1) {
         nodes.sort!((e1, e2) => e1.f < e2.f)();
