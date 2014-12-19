@@ -1,5 +1,6 @@
 graph/graph
 graham/graham
+graham/test/*.hull
 huffman/huffman
 huffman/test/*.huf*
 *.o
