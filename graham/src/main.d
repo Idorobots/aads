@@ -1,28 +1,23 @@
 import std.stdio;
-import std.getopt;
+import std.conv;
+import std.algorithm;
+import std.string;
 
 import graham;
 
 void main(string[] args) {
 
-    Point[] points1 = [Point(0, 3),
-                       Point(1, 1),
-                       Point(2, 2),
-                       Point(4, 4),
-                       Point(0, 0),
-                       Point(1, 2),
-                       Point(3, 1),
-                       Point(3, 3)];
+    Point[] points;
 
-    writeln(points1);
-    writeln(convexHull(points1));
+    foreach(line; stdin.byLine()) {
+        auto a = line.split(", ").map!(to!double);
+        points ~= Point(a[0], a[1]);
+    }
 
-    Point[] points2 = [Point(-1, -1),
-                       Point(-1, 1),
-                       Point(0, 0),
-                       Point(1, -1),
-                       Point(1, 1)];
+    auto hull = convexHull(points);
+    foreach(p; hull) {
+        writeln(p.x, ", ", p.y);
+    }
 
-    writeln(points2);
-    writeln(convexHull(points2));
+    writeln(hull[0].x, ", ", hull[0].y);
 }
