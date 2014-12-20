@@ -1,4 +1,5 @@
 import std.stdio;
+import std.getopt;
 import std.conv;
 import std.algorithm;
 import std.string;
@@ -6,7 +7,10 @@ import std.string;
 import graham;
 
 void main(string[] args) {
+    bool completeHull = false;
 
+    getopt(args,
+           "complete|c", &completeHull);
     Point[] points;
 
     foreach(line; stdin.byLine()) {
@@ -19,5 +23,5 @@ void main(string[] args) {
         writeln(p.x, ", ", p.y);
     }
 
-    writeln(hull[0].x, ", ", hull[0].y);
+    if(completeHull) writeln(hull[0].x, ", ", hull[0].y);
 }
