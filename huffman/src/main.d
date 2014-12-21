@@ -31,7 +31,8 @@ void main(string[] args) {
                "outfile|o", &outfile,
                "chunksize|s", &chunksize,
                "compress|c", &comp,
-               "decompress|d", &decomp);
+               "decompress|d", &decomp,
+               "help|h", &help);
 
         auto input = stdin;
         auto output = stdout;
