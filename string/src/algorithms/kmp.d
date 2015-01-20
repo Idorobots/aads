@@ -1,4 +1,4 @@
-module kmp;
+module algorithms.kmp;
 
 size_t[] knuthMorrisPratt(string pattern, string text) {
     long[] shifts;

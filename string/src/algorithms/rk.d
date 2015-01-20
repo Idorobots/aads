@@ -1,4 +1,4 @@
-module rk;
+module algorithms.rk;
 
 import std.algorithm;
 

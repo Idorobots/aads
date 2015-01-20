@@ -4,8 +4,8 @@ import std.typecons;
 import std.traits;
 import std.c.stdlib;
 
-import rk;
-import kmp;
+import algorithms.rk;
+import algorithms.kmp;
 
 alias MatchFun = size_t[] function(string, string);
 

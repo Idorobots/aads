@@ -5,9 +5,9 @@ DFLAGS = -Wall -Wextra -Isrc
 #GDB = -fdebug -funittest -ggdb3
 GDB = -O3 -frelease -ffast-math -fno-bounds-check
 
-VPATH = src
+VPATH = src:src/algorithms
 
-OBJS = main.o rk.d kmp.d
+OBJS = main.o rk.o kmp.o
 
 TARGET = string
 
