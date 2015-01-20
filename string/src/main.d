@@ -19,7 +19,7 @@ void test(bool extraOutput, string pattern, MatchFun f) {
     auto result = f(pattern, text);
 
     if(result.length) {
-        writeln("\"", pattern, "\" found at indeces: ", result);
+        writeln("\"", pattern, "\" found ", result.length, " times at indeces: ", result);
 
         if(extraOutput) {
             foreach(index; result) {
