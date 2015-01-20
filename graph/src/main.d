@@ -12,7 +12,9 @@ import std.range;
 import std.datetime;
 
 import graph;
-import algorithms;
+import algorithms.fw;
+import algorithms.bf;
+import algorithms.ff;
 import utils;
 
 void testFW(string graph, Vertex source, Vertex goal) {
