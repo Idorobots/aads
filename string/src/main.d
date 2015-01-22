@@ -12,8 +12,8 @@ alias MatchFun = size_t[] function(string, string);
 void test(bool extraOutput, string pattern, MatchFun f) {
     string text = "";
 
-    foreach(line; stdin.byLine()) {
-        text ~= line;
+    foreach(chunk; stdin.byChunk(1024)) {
+        text ~= chunk;
     }
 
     auto result = f(pattern, text);
