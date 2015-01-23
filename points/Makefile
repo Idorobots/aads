@@ -9,7 +9,7 @@ VPATH = src
 
 OBJS = main.o graham.o
 
-TARGET = graham
+TARGET = points
 
 $(TARGET) : $(OBJS)
 	$(DC) $^ $(LDLIBS) -o $@

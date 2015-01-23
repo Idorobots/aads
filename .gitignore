@@ -1,6 +1,6 @@
 graph/graph
-graham/graham
-graham/test/*.hull
+points/points
+points/test/*.hull
 huffman/huffman
 huffman/test/*.huf*
 string/string
