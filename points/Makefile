@@ -2,8 +2,8 @@ RM = rm -f
 DC = gdc
 LDLIBS =
 DFLAGS = -Wall -Wextra -Isrc
-GDB = -fdebug -funittest -ggdb3
-#GDB = -O3 -frelease -ffast-math -fno-bounds-check
+#GDB = -fdebug -funittest -ggdb3
+GDB = -O3 -frelease -ffast-math -fno-bounds-check
 
 VPATH = src
 
