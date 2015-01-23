@@ -1,7 +1,7 @@
 graph/graph
 points/points
 points/test/*.hull
-huffman/huffman
-huffman/test/*.huf*
+compression/compression
+compression/test/*.huf*
 string/string
 *.o

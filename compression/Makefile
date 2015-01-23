@@ -9,7 +9,7 @@ VPATH = src
 
 OBJS = main.o huffman.o utils.o
 
-TARGET = huffman
+TARGET = compression
 
 $(TARGET) : $(OBJS)
 	$(DC) $^ $(LDLIBS) -o $@
